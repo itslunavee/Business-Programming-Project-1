@@ -1,0 +1,96 @@
+  *****************************************************************
+      * Author: Luna Von Besser
+      * Student ID: 041165988
+      * Course + Section: CST8283
+      *****************************************************************
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPLOYEES-REPORT.
+       
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT EMPLOYEE-RECORDS ASSIGN TO "EMPLOYEES.txt"
+               ORGANIZATION IS LINE SEQUENTIAL.
+       
+       DATA DIVISION.
+       FILE SECTION.
+       FD EMPLOYEE-RECORDS.
+       01 EMPLOYEE-RECORD.
+           05 EMPLOYEE-ID PIC 9(6).
+           05 DEPT-CODE PIC 9(3).
+           05 LAST-NAME PIC X(20).
+           05 FIRST-NAME PIC X(20).
+           05 YRS-OF-SERVICE PIC 99V9.
+       
+       WORKING-STORAGE SECTION.
+       01 EOF-FLAG PIC X VALUE 'N'.
+       01 NO-MORE-RECORDS PIC X VALUE 'N'.
+       01 WS-RESPONSE-FLAG PIC X .
+
+       PROCEDURE DIVISION. 
+       100-INITIALIZE-REPORT.
+       OPEN OUTPUT EMPLOYEE-RECORDS
+       PERFORM 201-PROCESS-RECORDS UNTIL NO-MORE-RECORDS = 'Y'.
+       PERFORM 202-DISPLAY-RECORDS.
+       PERFORM 203-CLOSE-PROGRAM.
+
+       201-PROCESS-RECORDS.
+       PERFORM 301-GET-USER-INPUT.  
+       PERFORM 310-WRITE-TO-FILE.
+       PERFORM 320-CONTINUE-PROGRAM.
+
+       202-DISPLAY-RECORDS.
+       CLOSE EMPLOYEE-RECORDS
+       OPEN INPUT EMPLOYEE-RECORDS
+       DISPLAY " ".
+       DISPLAY "Employee ID Dept First Name   Last Name    Service Yrs".
+       DISPLAY "=====================================================".
+       PERFORM 302-READ-RECORD
+           UNTIL EOF-FLAG = 'Y'.
+       DISPLAY " ".
+       DISPLAY "=====================================================".
+       CLOSE EMPLOYEE-RECORDS.
+
+       203-CLOSE-PROGRAM.
+       STOP RUN.
+
+       301-GET-USER-INPUT.
+       DISPLAY "Enter Employee Information: " WITH NO ADVANCING.
+       DISPLAY "Enter Employee ID: " WITH NO ADVANCING. 
+           ACCEPT EMPLOYEE-ID.
+       DISPLAY "Enter Department Code: " WITH NO ADVANCING.
+           ACCEPT DEPT-CODE.
+       DISPLAY "Enter Last Name: " WITH NO ADVANCING.
+           ACCEPT LAST-NAME.
+       DISPLAY "Enter First Name: " WITH NO ADVANCING.
+           ACCEPT FIRST-NAME.
+       DISPLAY "Enter Years of Service: " WITH NO ADVANCING.
+           ACCEPT YRS-OF-SERVICE.
+       
+       302-READ-RECORD.
+       READ EMPLOYEE-RECORDS
+           AT END MOVE 'Y' TO EOF-FLAG
+           NOT AT END PERFORM 305-DISPLAY-EMPLOYEE-INFO
+       END-READ.
+
+       305-DISPLAY-EMPLOYEE-INFO.
+       IF YRS-OF-SERVICE >= 10.5
+           DISPLAY
+           EMPLOYEE-ID "   "
+           DEPT-CODE "   "
+           FIRST-NAME(1:10) "     "
+           LAST-NAME(1:10) "    "
+           YRS-OF-SERVICE
+       END-IF.
+
+       310-WRITE-TO-FILE.
+       WRITE EMPLOYEE-RECORD.
+       DISPLAY "Record written successfully.".
+
+       320-CONTINUE-PROGRAM.
+       DISPLAY "Enter another Employee? (Y/N): " WITH NO ADVANCING.
+           ACCEPT WS-RESPONSE-FLAG.
+           IF WS-RESPONSE-FLAG NOT = 'Y' AND WS-RESPONSE-FLAG NOT = 'y'
+               MOVE 'Y' TO NO-MORE-RECORDS
+           END-IF.
+
